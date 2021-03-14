@@ -1,0 +1,48 @@
+version: "3.7"
+
+networks:
+    api :
+        driver: bridge
+
+services:
+    app:
+        build:
+            args:
+                user: "antoine"
+                uid: 1001
+            context: ./bin/php
+            dockerfile: Dockerfile
+        image: splashfilms
+        container_name: splashfilms-api-app
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - ./www/:/var/www
+        networks:
+            - api
+        links: 
+            - database
+    nginx:
+        image: nginx:alpine
+        container_name: splashfilms-api-nginx
+        restart: unless-stopped
+        ports:
+            - 80:80
+        volumes:
+            - ./www/:/var/www
+            - ./bin/nginx:/etc/nginx/conf.d
+        networks:
+            - api
+    database:
+        image: mariadb:latest
+        container_name: splashfilms-api-db
+        restart: unless-stopped
+        ports: 
+            - 3306:3306
+        environment:
+            MYSQL_DATABASE: "splashfilms"
+            MYSQL_ROOT_PASSWORD: "laravel"
+            MYSQL_PASSWORD: "laravel"
+            MYSQL_USER: "laravel"
+        networks:
+            - api
