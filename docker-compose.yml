@@ -1,7 +1,7 @@
 version: "3.7"
 
 networks:
-    api :
+    laravel :
         driver: bridge
 
 services:
@@ -12,19 +12,19 @@ services:
                 uid: 1001
             context: ./bin/php
             dockerfile: Dockerfile
-        image: splashfilms
-        container_name: splashfilms-api-app
+        image: laravel
+        container_name: laravel-app
         restart: unless-stopped
         working_dir: /var/www
         volumes:
             - ./www/:/var/www
         networks:
-            - api
+            - laravel
         links: 
             - database
     nginx:
         image: nginx:alpine
-        container_name: splashfilms-api-nginx
+        container_name: laravel-nginx
         restart: unless-stopped
         ports:
             - 80:80
@@ -32,17 +32,17 @@ services:
             - ./www/:/var/www
             - ./bin/nginx:/etc/nginx/conf.d
         networks:
-            - api
+            - laravel
     database:
         image: mariadb:latest
-        container_name: splashfilms-api-db
+        container_name: laravel-db
         restart: unless-stopped
         ports: 
             - 3306:3306
         environment:
-            MYSQL_DATABASE: "splashfilms"
+            MYSQL_DATABASE: "laravel"
             MYSQL_ROOT_PASSWORD: "laravel"
             MYSQL_PASSWORD: "laravel"
             MYSQL_USER: "laravel"
         networks:
-            - api
+            - laravel
